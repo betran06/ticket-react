@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { replyTicketApi } from '../../api/ticket';
 import { Send, AlertCircle } from 'lucide-react';
+import { useToast } from '../ui';
 
 export function TicketReply({ ticketCode, currentStatus, role, onReplySuccess }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const toast = useToast();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
@@ -18,15 +20,17 @@ export function TicketReply({ ticketCode, currentStatus, role, onReplySuccess })
     setIsSubmitting(true);
     setErrorMsg('');
     try {
-      // Jika user biasa, buang payload status karena API menolaknya/tidak memprosesnya
       const payload = role === 'admin' ? data : { content: data.content };
       await replyTicketApi(ticketCode, payload);
-      reset(); // Kosongkan form
+      reset();
+      toast.success('Balasan berhasil dikirim.');
       if (onReplySuccess) {
-        onReplySuccess(); // Trigger SWR revalidate
+        onReplySuccess();
       }
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Terjadi kesalahan saat mengirim balasan.');
+      const msg = err.response?.data?.message || 'Terjadi kesalahan saat mengirim balasan.';
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -45,7 +49,7 @@ export function TicketReply({ ticketCode, currentStatus, role, onReplySuccess })
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {role === 'admin' ? (
+          {role === 'admin' && (
             <div>
               <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
                 Ubah Status Tiket
@@ -60,10 +64,6 @@ export function TicketReply({ ticketCode, currentStatus, role, onReplySuccess })
                 <option value="resolved">Resolved</option>
                 <option value="rejected">Rejected</option>
               </select>
-            </div>
-          ) : (
-            <div className="hidden">
-              {/* User tidak dapat mengubah status */}
             </div>
           )}
 
@@ -87,7 +87,7 @@ export function TicketReply({ ticketCode, currentStatus, role, onReplySuccess })
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSubmitting ? (
                 <>

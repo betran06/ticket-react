@@ -1,37 +1,30 @@
 import React from 'react';
 import { useDashboard } from '../../hooks/useDashboard';
-import { Ticket, Activity, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { Ticket, Activity, CheckCircle, Clock } from 'lucide-react';
+import { SkeletonStatCard, ErrorState } from '../../components/ui';
 
 export function AdminDashboard() {
-  const { dashboardData, isLoading, isError } = useDashboard();
+  const { dashboardData, isLoading, isError, mutate } = useDashboard();
 
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
+      <div className="space-y-6">
         <div>
-          <div className="h-8 w-48 bg-gray-200 rounded mb-2"></div>
-          <div className="h-4 w-64 bg-gray-200 rounded"></div>
+          <div className="h-8 w-48 bg-gray-200 rounded mb-2 animate-pulse"></div>
+          <div className="h-4 w-64 bg-gray-200 rounded animate-pulse"></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm h-32"></div>
+            <SkeletonStatCard key={i} />
           ))}
         </div>
-        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm h-64"></div>
+        <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm h-64 animate-pulse"></div>
       </div>
     );
   }
 
   if (isError) {
-    return (
-      <div className="bg-red-50 text-red-500 p-6 rounded-xl flex items-center gap-3">
-        <AlertCircle className="w-6 h-6" />
-        <div>
-          <h3 className="font-semibold text-lg">Gagal memuat data</h3>
-          <p className="text-sm">Terjadi kesalahan saat mengambil statistik dashboard. Silakan coba lagi.</p>
-        </div>
-      </div>
-    );
+    return <ErrorState onRetry={mutate} />;
   }
 
   const { 
@@ -56,12 +49,11 @@ export function AdminDashboard() {
         <p className="text-gray-500 text-sm">Statistik dan ringkasan tiket sistem (Bulan Ini).</p>
       </div>
 
-      {/* Statistic Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <div key={index} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-start justify-between hover:shadow-md transition-shadow">
+            <div key={index} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex items-start justify-between hover:shadow-md transition-shadow duration-200">
               <div>
                 <p className="text-gray-500 text-sm font-medium mb-1">{stat.title}</p>
                 <h3 className="text-3xl font-bold text-gray-900">{stat.value}</h3>
@@ -74,7 +66,6 @@ export function AdminDashboard() {
         })}
       </div>
 
-      {/* Status Distribution */}
       <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">Distribusi Status</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

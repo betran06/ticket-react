@@ -1,5 +1,6 @@
 import React from 'react';
 import { User, Shield } from 'lucide-react';
+import { formatDate } from '../../utils/format';
 
 export function TicketConversation({ replies }) {
   if (!replies || replies.length === 0) {
@@ -9,15 +10,6 @@ export function TicketConversation({ replies }) {
       </div>
     );
   }
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-      day: 'numeric', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
-    });
-  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
@@ -31,14 +23,12 @@ export function TicketConversation({ replies }) {
             
             return (
               <div key={reply.id} className="relative">
-                {/* Avatar Bullet */}
                 <div className={`absolute -left-[37px] md:-left-[45px] w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-4 border-white ${isAdmin ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}>
                   {isAdmin ? <Shield className="w-4 h-4 md:w-5 md:h-5" /> : <User className="w-4 h-4 md:w-5 md:h-5" />}
                 </div>
 
-                {/* Content */}
                 <div className="bg-white">
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2 gap-1">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-gray-900">{reply.user?.name}</span>
                       {isAdmin && (

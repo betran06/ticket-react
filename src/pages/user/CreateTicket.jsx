@@ -3,9 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { createTicketApi } from '../../api/ticket';
 import { ArrowLeft, Send, AlertCircle } from 'lucide-react';
+import { useToast } from '../../components/ui';
 
 export function CreateTicket() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -22,10 +24,12 @@ export function CreateTicket() {
     setErrorMsg('');
     try {
       await createTicketApi(data);
-      // Redirect to ticket list on success
+      toast.success('Tiket berhasil dibuat.');
       navigate('/user/tickets');
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Terjadi kesalahan saat membuat tiket.');
+      const msg = err.response?.data?.message || 'Terjadi kesalahan saat membuat tiket.';
+      setErrorMsg(msg);
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -36,7 +40,7 @@ export function CreateTicket() {
       <div className="flex items-center gap-4">
         <Link 
           to="/user/tickets"
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 cursor-pointer"
           title="Kembali"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -79,7 +83,7 @@ export function CreateTicket() {
             <select
               id="priority"
               {...register('priority', { required: 'Prioritas wajib dipilih' })}
-              className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors ${
+              className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors cursor-pointer ${
                 errors.priority ? 'border-red-300 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
               }`}
             >
@@ -116,7 +120,7 @@ export function CreateTicket() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSubmitting ? (
                 <>
