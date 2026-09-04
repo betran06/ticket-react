@@ -3,11 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { useTicketDetail } from '../../hooks/useTickets';
 import { TicketInfo } from '../../components/ticket/TicketInfo';
 import { TicketConversation } from '../../components/ticket/TicketConversation';
+import { TicketReply } from '../../components/ticket/TicketReply';
 import { ArrowLeft, AlertCircle } from 'lucide-react';
 
 export function AdminTicketDetail() {
   const { code } = useParams();
-  const { ticket, isLoading, error } = useTicketDetail(code);
+  const { ticket, isLoading, error, mutate } = useTicketDetail(code);
 
   if (isLoading) {
     return (
@@ -45,6 +46,14 @@ export function AdminTicketDetail() {
 
       <TicketInfo ticket={ticket} />
       <TicketConversation replies={ticket?.ticket_replies} />
+      {ticket && (
+        <TicketReply 
+          ticketCode={ticket.code} 
+          currentStatus={ticket.status} 
+          role="admin" 
+          onReplySuccess={mutate} 
+        />
+      )}
     </div>
   );
 }
